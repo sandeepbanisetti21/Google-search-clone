@@ -1,0 +1,111 @@
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-sanitize.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="searchengine.js"></script>
+	</head>
+	<style>
+		.textPro
+		{
+			width: 420px !important;
+			display: inline !important;
+		}
+		
+		.typeahead, .tt-query, .tt-hint {
+	border: 2px solid #CCCCCC;
+	border-radius: 8px;
+	font-size: 22px; /* Set input font size */
+	height: 30px;
+	line-height: 30px;
+	outline: medium none;
+	padding: 8px 12px;
+	width: 396px;
+}
+.typeahead {
+	background-color: #FFFFFF;
+}
+.typeahead:focus {
+	border: 2px solid #0097CF;
+}
+.tt-query {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+.tt-hint {
+	color: #999999;
+}
+.tt-menu {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	margin-top: 12px;
+	padding: 8px 0;
+	width: 422px;
+}
+.tt-suggestion {
+	font-size: 22px;  /* Set suggestion dropdown font size */
+	padding: 3px 20px;
+}
+.tt-suggestion:hover {
+	cursor: pointer;
+	background-color: #0097CF;
+	color: #FFFFFF;
+}
+.tt-suggestion p {
+	margin: 0;
+}
+		
+	</style>
+	<body>
+
+		<div ng-app="solrApp" ng-controller="solrCtrl">
+			<form >
+				<div class="form-group" style="display: inline;"><br>
+					&nbsp;&nbsp;<label >Enter the query</label>
+					<input type="text" required ng-model="query" ng-change="getAutoComplete()" class="form-control textPro" />
+					&nbsp;&nbsp;<button type="submit" class="btn btn-default" ng-click="prevent($event)">Hide dropdown</button> <br><br>
+				</div>
+				<div class="tt-menu" ng-show="suggestions.length > 0 && isFocussed" style="position: absolute; top: 6%; left: 112px; z-index: 100;display:block">
+					<div class="tt-dataset tt-dataset-cars">
+						<div ng-repeat="x in suggestions" class="tt-suggestion tt-selectable" ng-click="assignValue(x)">{{x.term}}</div>
+					</div>
+				</div>
+				<div class="form-group" style="display: inline;">
+					&nbsp;&nbsp;<label >Select Algorithm</label>
+					<select class="form-control textPro" id="algorithm" ng-model="selectedAlgo" ng-init="selectedAlgo='lucene'">
+						<option value="lucene">Lucene</option>
+						<option value="pageRank">Page Rank</option>
+					</select>
+					<br>
+					<br>
+					<button style="left: 100px;position: absolute;" class="btn btn-success" ng-click="send()">Query</button>
+				</div>
+			</form>
+			
+			<br>
+			<br>
+			<div ng-show="isCorrected">
+				<h4><b>Showing Results for <span style="color:blue;"><i>{{query}}</i></style><br></h4>
+				<h4><b>Search instead for <span style="color:blue;" ng-click="fetchResults()"><a href="#"><i><u>{{correctedWord}}</u></i></a></style><br></h4>
+			</div>
+			<div ng-show="isEmpty">
+				<span>Your search - <b><span style="font-size:18px;">{{query}}</span></b> - did not match any documents.</span>
+			</div>
+			&nbsp;&nbsp;<p ng-show="solrData.length > 0"><b style="width:15px"> Results 1-{{count}} of {{resCount}}</b></p>
+			<table style="width:1200px; margin-left:20px;">
+				<tbody ng-repeat="x in solrData">
+					<tr><td><a href="{{x.url}}" target="_blank"><b>{{x.title}}</b></a></td></tr>
+					<tr><td>&nbsp;&nbsp;<a href="{{x.url}}" target="_blank" style="color:green;">{{x.url}}</a></td></tr>
+					<tr><td>&nbsp;&nbsp;{{x.id}}</td></tr>
+					<tr><td ng-bind-html="x.description" data-toggle="tooltip" data-placement="top" title="{{x.totalDesc}}" >&nbsp;&nbsp;</td></tr>
+					<tr><td><br></td></tr>
+				</tbody>
+				<br>
+			</table>
+		</div>
+	</body>
+</html>
